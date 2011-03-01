@@ -11,6 +11,12 @@
 		android:layout_height="wrap_content"
 		android:text="Hello World, Collepi"
 		/>
+	<TextView
+		android:id="@+id/auth"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="not logged in"
+		/>
 
 
 	<Button
