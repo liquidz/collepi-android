@@ -20,6 +20,8 @@ import org.apache.http.client.params.ClientPNames;
 import org.apache.http.cookie.Cookie;
 
 public class GoogleAccountLogin {
+	static final String GAE_URL = "http://colle-pi.appspot.com";
+
 	AccountManager accountManager = null;
 	Context context = null;
 	Runnable callback = null;

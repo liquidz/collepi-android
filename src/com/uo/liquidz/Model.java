@@ -1,6 +1,8 @@
 package com.uo.liquidz;
 
+import java.io.*;
 import java.util.List;
+import java.net.URL;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.Gson;
 
@@ -46,7 +48,7 @@ public class Model {
 		gson = new Gson();
 	}
 
-	public Object get(String url, Class<?> klass){
+	public Object get(String urlStr, Class<?> klass){
 		try {
 			URL url = new URL(urlStr);
 			Reader reader = new InputStreamReader(url.openStream());
