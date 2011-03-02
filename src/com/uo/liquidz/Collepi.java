@@ -34,12 +34,12 @@ import android.widget.TextView;
 
 import android.widget.Toast;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
+//import android.accounts.Account;
+//import android.accounts.AccountManager;
+//import android.accounts.AccountManagerFuture;
+//import android.accounts.AccountManagerCallback;
+//import android.accounts.AuthenticatorException;
+//import android.accounts.OperationCanceledException;
 // }}}
 
 public class Collepi extends Activity
@@ -47,6 +47,7 @@ public class Collepi extends Activity
 	static final String GAE_URL = "http://colle-pi.appspot.com";
 	AccountManager accountManager = null;
 	String acsid = null;
+	GoogleAccountLogin gal = null;
 
     /** Called when the activity is first created. */
     @Override
@@ -74,12 +75,19 @@ public class Collepi extends Activity
 	@Override
 	public void onResume(){
 		super.onResume();
-		accountManager = AccountManager.get(this);
-		Account[] accounts = accountManager.getAccountsByType("com.google");
-		if(accounts.length > 0){
-			// ah = appengine
-			accountManager.getAuthToken(accounts[0], "ah", false, new GetAuthTokenCallback(), null);
-		}
+		//accountManager = AccountManager.get(this);
+		//Account[] accounts = accountManager.getAccountsByType("com.google");
+		//if(accounts.length > 0){
+		//	// ah = appengine
+		//	accountManager.getAuthToken(accounts[0], "ah", false, new GetAuthTokenCallback(), null);
+		//}
+
+		gal = new GoogleAccountLogin(this);
+		gal.login(new Runnable(){
+			public void run(){
+				Toast.makeText(Collepi.this, "login successful", Toast.LENGTH_LONG).show();
+			}
+		});
 	}
 
 	@Override
@@ -90,11 +98,13 @@ public class Collepi extends Activity
 				String barcode = intent.getStringExtra("SCAN_RESULT");
 				text.setText(barcode);
 
-				if(acsid != null){
+				//if(acsid != null){
+				if(gal != null){
 					// post
 					DefaultHttpClient http = new DefaultHttpClient();
 					HttpPost post = new HttpPost(GAE_URL + "/update/collection");
-					post.setHeader("Cookie", acsid);
+					//post.setHeader("Cookie", acsid);
+					post.setHeader("Cookie", gal.getAuthCookie());
 					List<NameValuePair> params = new ArrayList<NameValuePair>();
 					params.add(new BasicNameValuePair("isbn", barcode));
 
@@ -207,3 +217,4 @@ public class Collepi extends Activity
 		}
 	}
 }
+
