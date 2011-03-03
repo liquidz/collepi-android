@@ -6,6 +6,11 @@ import java.net.URL;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.Gson;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 class Login {
     public String loggedin, url, avatar, nickname;
     public boolean isLoggedin(){
@@ -49,13 +54,26 @@ public class Model {
 	}
 
 	public Object get(String urlStr, Class<?> klass){
+		DefaultHttpClient http = new DefaultHttpClient();
+		HttpGet get = new HttpGet(urlStr);
+		HttpResponse res = null;
+
 		try {
-			URL url = new URL(urlStr);
-			Reader reader = new InputStreamReader(url.openStream());
+			res = http.execute(get);
+
+			Reader reader = new InputStreamReader(res.getEntity().getContent());
 			return gson.fromJson(reader, klass);
 		} catch(Exception e){
 			e.printStackTrace();
 		}
+
+		//try {
+		//	URL url = new URL(urlStr);
+		//	Reader reader = new InputStreamReader(url.openStream());
+		//	return gson.fromJson(reader, klass);
+		//} catch(Exception e){
+		//	e.printStackTrace();
+		//}
 		return null;
 	}
 }
