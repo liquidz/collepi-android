@@ -48,6 +48,8 @@ public class Collepi extends Activity
 	AccountManager accountManager = null;
 	String acsid = null;
 	GoogleAccountLogin gal = null;
+	Handler handler = null;
+	Model model = null;
 
     /** Called when the activity is first created. */
     @Override
@@ -55,6 +57,9 @@ public class Collepi extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+		handler = new Handler();
+		model = new Model();
 
 		Button btn = (Button)findViewById(R.id.button);
 		btn.setOnClickListener(new OnClickListener(){
@@ -70,6 +75,13 @@ public class Collepi extends Activity
 
 			}
 		});
+
+		((Button)findViewById(R.id.showmylist)).setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v){
+				startActivity(new Intent(Collepi.this, MyCollection.class));
+			}
+		});
     }
 
 	@Override
@@ -83,7 +95,7 @@ public class Collepi extends Activity
 		//}
 
 		gal = new GoogleAccountLogin(this);
-		gal.login(new Runnable(){
+		gal.login(handler, new Runnable(){
 			public void run(){
 				Toast.makeText(Collepi.this, "login successful", Toast.LENGTH_LONG).show();
 			}
@@ -125,7 +137,7 @@ public class Collepi extends Activity
 	public boolean onCreateOptionsMenu(Menu menu){
 		boolean ret = super.onCreateOptionsMenu(menu);
 
-		menu.add(0, Menu.FIRST, Menu.NONE, "menu1");//.setIcon(R.drawable.ic_menu_help);
+		menu.add(0, Menu.FIRST, Menu.NONE, "load");//.setIcon(R.drawable.ic_menu_help);
 		menu.add(0, Menu.FIRST + 1, Menu.NONE, "menu2");//.setIcon(R.drawable.ic_menu_add);
 
 		return ret;
@@ -133,8 +145,19 @@ public class Collepi extends Activity
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
-		System.out.println(item.getGroupId());
-		System.out.println(item.getItemId());
+		switch(Menu.FIRST - item.getId()){
+		case 0:
+			// load
+			Collection[] c = (Collection[])model.get("/my/collection", Collection[].class);
+
+
+			break;
+		case 1 :
+			System.out.println("hogehoge");
+			break;
+		}
+		//System.out.println(item.getGroupId());
+		//System.out.println(item.getItemId());
 
 		return super.onOptionsItemSelected(item);
 	}

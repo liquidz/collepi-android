@@ -17,5 +17,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+		<!--
+		<service android:name="MyIntentService"></service>
+		-->
+		<service android:name="GoogleAccountLogin"></service>
     </application>
 </manifest> 

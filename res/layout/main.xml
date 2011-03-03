@@ -23,7 +23,14 @@
 		android:id="@+id/button"
 		android:layout_width="100px"
 		android:layout_height="wrap_content"
-		android:text="click"
+		android:text="scan barcode"
+		/>
+
+	<Button
+		android:id="@+id/showmylist"
+		android:layout_width="100px"
+		android:layout_height="wrap_content"
+		android:text="show my list"
 		/>
 
 </LinearLayout>
