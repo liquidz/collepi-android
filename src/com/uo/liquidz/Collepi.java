@@ -34,7 +34,7 @@ import android.widget.Toast;
 
 public class Collepi extends Activity
 {
-	static final String GAE_URL = "http://colle-pi.appspot.com";
+	//static final String GAE_URL = "http://colle-pi.appspot.com";
 	GoogleAccountLogin gal = null;
 	Handler handler = null;
 	Model model = null;
@@ -72,23 +72,22 @@ public class Collepi extends Activity
 			}
 		});
 
-		if(gal == null){
-			gal = new GoogleAccountLogin(this, GAE_URL);
-			gal.login(handler, new Runnable(){
-				public void run(){
-					TextView text = (TextView)findViewById(R.id.auth);
-					text.setText("login successful");
-	
-					Toast.makeText(Collepi.this, "login successful hoge", Toast.LENGTH_LONG).show();
-				}
-			});
-		}
     }
 
 	@Override
 	public void onResume(){
 		super.onResume();
 
+		////gal = new GoogleAccountLogin(this, GAE_URL);
+		//gal = new GoogleAccountLogin(this, getString(R.string.appengine_url));
+		//gal.login(handler, new Runnable(){
+		//	public void run(){
+		//		TextView text = (TextView)findViewById(R.id.auth);
+		//		text.setText("login successful");
+	
+		//		Toast.makeText(Collepi.this, "login successful hoge", Toast.LENGTH_LONG).show();
+		//	}
+		//});
 	}
 
 	@Override
@@ -100,9 +99,27 @@ public class Collepi extends Activity
 				text.setText(barcode);
 
 				if(gal != null){
+
+					HashMap<String, String> postParams = new HashMap<String, String>(),
+						header = new HashMap<String, String>();
+					postParams.put("isbn", barcode);
+					header.put("Cookie", gal.getAuthCookie());
+
+					AsyncHttp.post(url + "/update/collection", header, postParams, new Runnable(){
+						public void run(){
+							Toast.makeText(Collepi.this, "post successful", Toast.LENGTH_LONG).show();
+						}
+					}, new Runnable(){
+						public void run(){
+							Toast.makeText(Collepi.this, "post failed..", Toast.LENGTH_LONG).show();
+						}
+					});
+
 					// post
 					DefaultHttpClient http = new DefaultHttpClient();
-					HttpPost post = new HttpPost(GAE_URL + "/update/collection");
+					//HttpPost post = new HttpPost(GAE_URL + "/update/collection");
+					String url = getString(R.string.appengine_url);
+					HttpPost post = new HttpPost(url + "/update/collection");
 					post.setHeader("Cookie", gal.getAuthCookie());
 					List<NameValuePair> params = new ArrayList<NameValuePair>();
 					params.add(new BasicNameValuePair("isbn", barcode));
@@ -117,6 +134,42 @@ public class Collepi extends Activity
 				}
 
 			}
+		}
+	}
+
+	private boolean asyncPost(String path, List<NameValuePair> params){
+		asyncPost(path, params, null, null);
+	}
+	private boolean asyncPost(String path, List<NameValuePair> params, Runnable success){
+		asyncPost(path, params, success, null);
+	}
+	private boolean asyncPost(String path, List<NameValuePair> params, Runnable success, Runnable fail){
+		final Runnable successCallback = success;
+		final Runnable failCallback = fail;
+		final List<NameValuePair> postParams = params;
+		if(gal != null){
+			(new Thread(){
+				public void run(){
+					// post
+					DefaultHttpClient http = new DefaultHttpClient();
+					//HttpPost post = new HttpPost(GAE_URL + "/update/collection");
+					String url = getString(R.string.appengine_url);
+					HttpPost post = new HttpPost(url + path);
+					post.setHeader("Cookie", gal.getAuthCookie());
+
+					try {
+						post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+						HttpResponse res = http.execute(post);
+						if(successCallback != null){
+							successCallback.run();
+						}
+					} catch(Exception e){
+						if(failCallback != null){
+							failCallback.run();
+						}
+					}
+				}
+			}).start();
 		}
 	}
 

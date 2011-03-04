@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 public class MyCollection extends Activity {
-	static final String GAE_URL = "http://colle-pi.appspot.com";
+	//static final String GAE_URL = "http://colle-pi.appspot.com";
 
 	@Override
     public void onCreate(Bundle savedInstanceState){
@@ -17,7 +17,9 @@ public class MyCollection extends Activity {
 
 		Model model = new Model();
 		//Collection[] coll = (Collection[])model.get("/my/collection", Collection[].class);
-		Collection[] coll = (Collection[])model.get(GAE_URL + "/collection/list", Collection[].class);
+		String url = getString(R.string.appengine_url);
+		//Collection[] coll = (Collection[])model.get(GAE_URL + "/collection/list", Collection[].class);
+		Collection[] coll = (Collection[])model.get(url + "/collection/list", Collection[].class);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 
 		//Toast.makeText(this, "len = " + coll.length, Toast.LENGTH_SHORT).show();
