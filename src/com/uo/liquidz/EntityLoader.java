@@ -11,49 +11,33 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-class Login {
-    public String loggedin, url, avatar, nickname;
-    public boolean isLoggedin(){
-        return loggedin.equals("true");
-    }
-}
+//abstract class AppengineEntity {}
 
-class User {
-    public String nickname, avatar, date;
-    public String key;
-
-    public List<Collection> collection;
-    public List<History> history;
-}
-
-class Item {
-    public String isbn, title, author, smallimage, mediumimage, largeimage;
-
-    public List<Collection> collection;
-    public List<History> history;
-}
-
-class Collection {
-    public String id, point, read, date;
-
-    public Item item;
-    public User user;
-}
-
-class History {
-    public String point, read, comment, date;
-    public Item item;
-    public User user;
-}
-
-public class Model {
+public class EntityLoader {
 	Gson gson = null;
+	GoogleAccountLogin gal = null;
 
-	public Model(){
+	public EntityLoader(){
+		this(null);
+	}
+	public EntityLoader(GoogleAccountLogin gal){
 		gson = new Gson();
+		this.gal = gal;
 	}
 
 	public Object get(String urlStr, Class<?> klass){
+		//AsyncHttpGet get = new AsyncHttpGet(urlStr);
+		//if(gal != null && gal.getAuthCookie() != null){
+		//	get.addCookie(gal.getAuthCookie());
+		//}
+
+		//try {
+		//	get.setCallback(new AsyncHttpCallback<HttpResponse>(){
+		//		public void success(HttpResponse res){
+		//		}
+		//	}).execute()
+		//} catch(Exception e){}
+
 		DefaultHttpClient http = new DefaultHttpClient();
 		HttpGet get = new HttpGet(urlStr);
 		HttpResponse res = null;
@@ -67,13 +51,7 @@ public class Model {
 			e.printStackTrace();
 		}
 
-		//try {
-		//	URL url = new URL(urlStr);
-		//	Reader reader = new InputStreamReader(url.openStream());
-		//	return gson.fromJson(reader, klass);
-		//} catch(Exception e){
-		//	e.printStackTrace();
-		//}
 		return null;
 	}
 }
+
