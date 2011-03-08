@@ -14,13 +14,16 @@ import com.uo.liquidz.adapter.CollectionAdapter;
 import com.uo.liquidz.entity.Collection;
 
 public class MyCollection extends Activity {
-	final String gae_url = getString(R.string.appengine_url);
+	//final String gae_url = getString(R.string.appengine_url);
+	String gae_url = null;
 	Collection[] coll;
 
 	@Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
+
+		gae_url = getString(R.string.appengine_url);
 
 		EntityLoader loader = new EntityLoader();
 		coll = (Collection[])loader.get(gae_url + "/collection/list", Collection[].class);

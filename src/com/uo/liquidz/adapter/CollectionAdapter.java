@@ -17,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 // }}}
 
+import android.util.Log;
+
 public class CollectionAdapter extends ArrayAdapter<Collection> {
 	List<Collection> items;
 	LayoutInflater inflater;
@@ -43,8 +45,10 @@ public class CollectionAdapter extends ArrayAdapter<Collection> {
 		//Collection coll = (Collection)items.get(position);
 		Collection coll = getItem(position);
 		//final Collection fColl = coll;
-		TextView text = (TextView)v.findViewById(R.id.title);
+		TextView text = (TextView)v.findViewById(R.id.ctitle);
 		text.setText(coll.item.title);
+
+		Log.v("title", coll.item.title);
 
 		TextView point = (TextView)v.findViewById(R.id.point);
 		text.setText(coll.point);

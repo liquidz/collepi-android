@@ -51,7 +51,7 @@ public class GoogleAccountLogin {
 	//}
 	
 	public void doAuth(AsyncHttpCallback callback){
-		login(null, callback);
+		doAuth(null, callback);
 	}
 
 	//public void login(Runnable successCallback, Runnable failCallback){
@@ -59,7 +59,7 @@ public class GoogleAccountLogin {
 	//}
 
 	//public void login(Handler handler, Runnable successCallback, Runnable failCallback){
-	public void login(Handler handler, AsyncHttpCallback callback){
+	public void doAuth(Handler handler, AsyncHttpCallback callback){
 		//this.successCallback = successCallback;
 		//this.failCallback = failCallback;
 		this.handler = handler;

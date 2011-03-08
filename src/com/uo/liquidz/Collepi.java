@@ -42,7 +42,8 @@ public class Collepi extends Activity
 
 	static GoogleAccountLogin login = null;
 	Handler handler = null;
-	final String gae_url = getString(R.string.appengine_url);
+	//final String gae_url = getString(R.string.appengine_url);
+	String gae_url = null;
 
 	RecordManager recman;
 	long recid;
@@ -75,6 +76,8 @@ public class Collepi extends Activity
 		handler = new Handler();
 		initJDBM();
 
+		gae_url = getString(R.string.appengine_url);
+
 		Button btn = (Button)findViewById(R.id.button);
 		btn.setOnClickListener(new OnClickListener(){
 			//@Override
@@ -98,19 +101,19 @@ public class Collepi extends Activity
 		});
 		//((Button)findViewById(R.id.recentlist)).setOnClickListener(new OnClickListener(){
 
-		gal = new GoogleAccountLogin(this);
-		gal.login(handler, new AsyncHttpCallback(){
+		login = new GoogleAccountLogin(this);
+		login.doAuth(handler, new AsyncHttpCallback(){
 			public void success(){
 				TextView text = (TextView)findViewById(R.id.auth);
 				text.setText("login successful");
 				Toast.makeText(Collepi.this, "login successful hoge", Toast.LENGTH_LONG).show();
 
-				EntityLoader loader = new EntityLoader(gal);
-				Collection[] coll = (Collection[])loader.get("/my/collection", Collection[].class)
+				//EntityLoader loader = new EntityLoader(gal);
+				//Collection[] coll = (Collection[])loader.get("/my/collection", Collection[].class);
 			}
 			public void fail(){
 		      TextView text = (TextView)findViewById(R.id.auth);
-		      text.setText("login failed")
+		      text.setText("login failed");
 			}
 		});
     }
