@@ -3,13 +3,12 @@ package com.uo.liquidz.adapter;
 // imports {{{
 import com.uo.liquidz.R;
 import com.uo.liquidz.entity.Collection;
+import com.uo.liquidz.util.BitmapLoader;
 
-import java.net.URL;
 import java.util.List;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,13 +46,14 @@ public class CollectionAdapter extends ArrayAdapter<Collection> {
 		TextView text = (TextView)v.findViewById(R.id.title);
 		text.setText(coll.item.title);
 
-		ImageView image = (ImageView)v.findViewById(R.id.thumbnail);
+		TextView point = (TextView)v.findViewById(R.id.point);
+		text.setText(coll.point);
 
-		try {
-			URL imageUrl = new URL(coll.item.smallimage);
-			Bitmap thumb = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream());
+		ImageView image = (ImageView)v.findViewById(R.id.thumbnail);
+		Bitmap thumb = BitmapLoader.load(coll.item.smallimage);
+		if(thumb != null){
 			image.setImageBitmap(thumb);
-		} catch(Exception e){}
+		}
 
 		return v;
 	}

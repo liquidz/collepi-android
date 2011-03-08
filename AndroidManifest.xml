@@ -19,12 +19,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="MyCollection">
-        </activity>
+        <activity android:name="MyCollection"></activity>
+        <activity android:name="CollectionDetail"></activity>
+        <activity android:name="PostCollection"></activity>
 
-		<!--
-		<service android:name="MyIntentService"></service>
-		<service android:name="GoogleAccountLogin"></service>
-		-->
+		<uses-library android:name="android.test.runner" />
     </application>
+
+	<instrumentation android:name="android.test.InstrumentationTestRunner"
+		android:targetPackage="com.uo.liquidz"
+		android:label="Tests for Api Demos." />
 </manifest> 

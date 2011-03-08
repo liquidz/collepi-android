@@ -105,28 +105,31 @@ public class AsyncHttpClient {
 					try {
 						final HttpResponse res = client.execute(request);
 						if(canCallback()){
-							handler.post(new Runnable(){
-								public void run(){
-									callback.success(res);
-								}
-							});
+							handler.post(callback.getSuccess(res));
+							//handler.post(new Runnable(){
+							//	public void run(){
+							//		callback.success(res);
+							//	}
+							//});
 						}
 					} catch(Exception e){
 						if(canCallback()){
-							handler.post(new Runnable(){
-								public void run(){
-									callback.fail();
-								}
-							});
+							handler.post(callback.getFail());
+							//handler.post(new Runnable(){
+							//	public void run(){
+							//		callback.fail();
+							//	}
+							//});
 						}
 					}
 
 					if(canCallback()){
-						handler.post(new Runnable(){
-							public void run(){
-								callback.complete();
-							}
-						});
+						handler.post(callback.getComplete());
+						//handler.post(new Runnable(){
+						//	public void run(){
+						//		callback.complete();
+						//	}
+						//});
 					}
 				}
 			}).start();

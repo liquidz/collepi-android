@@ -4,16 +4,16 @@ package com.uo.liquidz;
 import java.io.*;
 import java.util.*;
 
+// jdbm
+import java.util.Properties;
+import jdbm.RecordManager;
+import jdbm.RecordManagerFactory;
+import jdbm.helper.Tuple;
+import jdbm.helper.TupleBrowser;
+import jdbm.helper.StringComparator;
+import jdbm.btree.BTree;
+
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.protocol.HTTP;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -27,17 +27,43 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.EditText;
 
 import android.widget.Toast;
+
+import com.uo.liquidz.util.*;
 
 // }}}
 
 public class Collepi extends Activity
 {
-	//static final String GAE_URL = "http://colle-pi.appspot.com";
-	GoogleAccountLogin gal = null;
+	static String DATABASE = "test";
+	static String BTREE_NAME = "value";
+
+	static GoogleAccountLogin login = null;
 	Handler handler = null;
-	Model model = null;
+	final String gae_url = getString(R.string.appengine_url);
+
+	RecordManager recman;
+	long recid;
+	BTree tree;
+	Properties props = new Properties();
+
+	private void initJDBM(){
+		try {
+			recman = RecordManagerFactory.createRecordManager(DATABASE, props);
+			recid = recman.getNamedObject(BTREE_NAME);
+	
+			if(recid != 0){
+				tree = BTree.load(recman, recid);
+			} else {
+				tree = BTree.createInstance(recman, new StringComparator());
+				recman.setNamedObject(BTREE_NAME, tree.getRecid());
+			}
+		} catch(Exception e){
+			recman = null;
+		}
+	}
 
     /** Called when the activity is first created. */
     @Override
@@ -47,11 +73,11 @@ public class Collepi extends Activity
         setContentView(R.layout.main);
 
 		handler = new Handler();
-		model = new Model();
+		initJDBM();
 
 		Button btn = (Button)findViewById(R.id.button);
 		btn.setOnClickListener(new OnClickListener(){
-			@Override
+			//@Override
 			public void onClick(View v){
 				Intent intent = new Intent("com.google.zxing.client.android.SCAN");
 				intent.putExtra("SCAN_MODE", "ONE_D_MODE");
@@ -60,33 +86,66 @@ public class Collepi extends Activity
 				} catch (ActivityNotFoundException e){
 					Toast.makeText(Collepi.this, "error", Toast.LENGTH_LONG).show();
 				}
-
 			}
 		});
 
-		((Button)findViewById(R.id.showmylist)).setOnClickListener(new OnClickListener(){
-			@Override
+		((Button)findViewById(R.id.recentlist)).setOnClickListener(new OnClickListener(){
+			//@Override
 			public void onClick(View v){
 				Intent i = new Intent(Collepi.this, MyCollection.class);
 				startActivity(i);
 			}
 		});
+		//((Button)findViewById(R.id.recentlist)).setOnClickListener(new OnClickListener(){
 
+		gal = new GoogleAccountLogin(this);
+		gal.login(handler, new AsyncHttpCallback(){
+			public void success(){
+				TextView text = (TextView)findViewById(R.id.auth);
+				text.setText("login successful");
+				Toast.makeText(Collepi.this, "login successful hoge", Toast.LENGTH_LONG).show();
+
+				EntityLoader loader = new EntityLoader(gal);
+				Collection[] coll = (Collection[])loader.get("/my/collection", Collection[].class)
+			}
+			public void fail(){
+		      TextView text = (TextView)findViewById(R.id.auth);
+		      text.setText("login failed")
+			}
+		});
     }
 
 	@Override
 	public void onResume(){
 		super.onResume();
 
-		////gal = new GoogleAccountLogin(this, GAE_URL);
-		//gal = new GoogleAccountLogin(this, getString(R.string.appengine_url));
-		//gal.login(handler, new Runnable(){
+		//gal = new GoogleAccountLogin(this);
+		//gal.login(handler, new AsyncHttpCallback(){
+		//	public void success(){
+		//		TextView text = (TextView)findViewById(R.id.auth);
+		//		text.setText("login successful");
+		//		Toast.makeText(Collepi.this, "login successful hoge", Toast.LENGTH_LONG).show();
+		//	}
+		//	public void fail(){
+		//      TextView text = (TextView)findViewById(R.id.auth);
+		//      text.setText("login failed")
+		//	}
+		//});
+
+		////login = new GoogleAccountLogin(this, GAE_URL);
+		//login = new GoogleAccountLogin(this, getString(R.string.appengine_url));
+		//login.doAuth(handler, new Runnable(){
 		//	public void run(){
 		//		TextView text = (TextView)findViewById(R.id.auth);
 		//		text.setText("login successful");
 	
 		//		Toast.makeText(Collepi.this, "login successful hoge", Toast.LENGTH_LONG).show();
 		//	}
+		//}, new Runnable(){
+		//  public void run(){
+		//      TextView text = (TextView)findViewById(R.id.auth);
+		//      text.setText("login failed")
+		//  }
 		//});
 	}
 
@@ -98,78 +157,32 @@ public class Collepi extends Activity
 				String barcode = intent.getStringExtra("SCAN_RESULT");
 				text.setText(barcode);
 
-				if(gal != null){
+				// post
+				//postCollection(barcode);
+				Intent i = new Intent(Collepi.this, PostCollection.class);
+				i.putExtra("ISBN", barcode);
+				startActivity(i);
 
-					HashMap<String, String> postParams = new HashMap<String, String>(),
-						header = new HashMap<String, String>();
-					postParams.put("isbn", barcode);
-					header.put("Cookie", gal.getAuthCookie());
+				//if(login != null){
+				//	//// post
+				//	//DefaultHttpClient http = new DefaultHttpClient();
+				//	////HttpPost post = new HttpPost(GAE_URL + "/update/collection");
+				//	//String url = getString(R.string.appengine_url);
+				//	//HttpPost post = new HttpPost(url + "/update/collection");
+				//	//post.setHeader("Cookie", gal.getAuthCookie());
+				//	//List<NameValuePair> params = new ArrayList<NameValuePair>();
+				//	//params.add(new BasicNameValuePair("isbn", barcode));
 
-					AsyncHttp.post(url + "/update/collection", header, postParams, new Runnable(){
-						public void run(){
-							Toast.makeText(Collepi.this, "post successful", Toast.LENGTH_LONG).show();
-						}
-					}, new Runnable(){
-						public void run(){
-							Toast.makeText(Collepi.this, "post failed..", Toast.LENGTH_LONG).show();
-						}
-					});
-
-					// post
-					DefaultHttpClient http = new DefaultHttpClient();
-					//HttpPost post = new HttpPost(GAE_URL + "/update/collection");
-					String url = getString(R.string.appengine_url);
-					HttpPost post = new HttpPost(url + "/update/collection");
-					post.setHeader("Cookie", gal.getAuthCookie());
-					List<NameValuePair> params = new ArrayList<NameValuePair>();
-					params.add(new BasicNameValuePair("isbn", barcode));
-
-					try {
-						post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
-						HttpResponse res = http.execute(post);
-						Toast.makeText(Collepi.this, "post successful", Toast.LENGTH_LONG).show();
-					} catch(Exception e){
-						Toast.makeText(Collepi.this, "post failed..", Toast.LENGTH_LONG).show();
-					}
-				}
+				//	//try {
+				//	//	post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+				//	//	HttpResponse res = http.execute(post);
+				//	//	Toast.makeText(Collepi.this, "post successful", Toast.LENGTH_LONG).show();
+				//	//} catch(Exception e){
+				//	//	Toast.makeText(Collepi.this, "post failed..", Toast.LENGTH_LONG).show();
+				//	//}
+				//}
 
 			}
-		}
-	}
-
-	private boolean asyncPost(String path, List<NameValuePair> params){
-		asyncPost(path, params, null, null);
-	}
-	private boolean asyncPost(String path, List<NameValuePair> params, Runnable success){
-		asyncPost(path, params, success, null);
-	}
-	private boolean asyncPost(String path, List<NameValuePair> params, Runnable success, Runnable fail){
-		final Runnable successCallback = success;
-		final Runnable failCallback = fail;
-		final List<NameValuePair> postParams = params;
-		if(gal != null){
-			(new Thread(){
-				public void run(){
-					// post
-					DefaultHttpClient http = new DefaultHttpClient();
-					//HttpPost post = new HttpPost(GAE_URL + "/update/collection");
-					String url = getString(R.string.appengine_url);
-					HttpPost post = new HttpPost(url + path);
-					post.setHeader("Cookie", gal.getAuthCookie());
-
-					try {
-						post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
-						HttpResponse res = http.execute(post);
-						if(successCallback != null){
-							successCallback.run();
-						}
-					} catch(Exception e){
-						if(failCallback != null){
-							failCallback.run();
-						}
-					}
-				}
-			}).start();
 		}
 	}
 
@@ -177,8 +190,8 @@ public class Collepi extends Activity
 	public boolean onCreateOptionsMenu(Menu menu){
 		boolean ret = super.onCreateOptionsMenu(menu);
 
-		menu.add(0, Menu.FIRST, Menu.NONE, "load");//.setIcon(R.drawable.ic_menu_help);
-		menu.add(0, Menu.FIRST + 1, Menu.NONE, "menu2");//.setIcon(R.drawable.ic_menu_add);
+		menu.add(0, Menu.FIRST, Menu.NONE, "Reload");//.setIcon(R.drawable.ic_menu_help);
+		menu.add(0, Menu.FIRST + 1, Menu.NONE, "Exit");//.setIcon(R.drawable.ic_menu_add);
 
 		return ret;
 	}
@@ -188,18 +201,34 @@ public class Collepi extends Activity
 		switch(Menu.FIRST - item.getItemId()){
 		case 0:
 			// load
-			Collection[] c = (Collection[])model.get("/my/collection", Collection[].class);
-
-
 			break;
 		case 1 :
-			System.out.println("hogehoge");
+			finish();
 			break;
 		}
 		//System.out.println(item.getGroupId());
 		//System.out.println(item.getItemId());
 
 		return super.onOptionsItemSelected(item);
+	}
+
+
+	private void postCollection(String isbn){
+		if(login == null){ return; }
+
+		AsyncHttpPost post = new AsyncHttpPost(gae_url + "/update/collection");
+		post.addCookie(login.getAuthCookie()).addParameter("isbn", isbn).setHandler(handler)
+			.setCallback(new AsyncHttpCallback<HttpResponse>(){
+				public void success(HttpResponse res){
+					Toast.makeText(Collepi.this, "post successful!", Toast.LENGTH_SHORT).show();
+				}
+				public void fail(){
+					Toast.makeText(Collepi.this, "post failed...", Toast.LENGTH_SHORT).show();
+				}
+			});
+		try {
+			post.execute();
+		} catch(Exception e){}
 	}
 }
 

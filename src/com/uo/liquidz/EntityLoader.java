@@ -53,5 +53,8 @@ public class EntityLoader {
 
 		return null;
 	}
+
+	public void asyncGet(String urlStr, Class<?> klass, AsyncHttpCallback callback){
+	}
 }
 

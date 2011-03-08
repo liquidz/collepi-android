@@ -6,16 +6,17 @@
 	>
 
 	<TextView
+		android:id="@+id/auth"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="logging in..."
+		/>
+
+	<TextView
 		android:id="@+id/text"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:text="Hello World, Collepi"
-		/>
-	<TextView
-		android:id="@+id/auth"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:text="not logged in"
 		/>
 
 
@@ -27,11 +28,30 @@
 		/>
 
 	<Button
-		android:id="@+id/showmylist"
+		android:id="@+id/recentlist"
 		android:layout_width="100px"
 		android:layout_height="wrap_content"
-		android:text="show my list"
+		android:text="recent collection"
 		/>
+
+	<EditText android:id="@+id/edittest"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		/>
+	<Button android:id="@+id/save"
+		android:layout_width="100px"
+		android:layout_height="wrap_content"
+		android:text="save"
+		/>
+	<Button android:id="@+id/read"
+		android:layout_width="100px"
+		android:layout_height="wrap_content"
+		android:text="read"
+		/>
+
+	<ListView android:id="@+id/mylist"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
 
 </LinearLayout>
 
